@@ -76,7 +76,6 @@ vim.api.nvim_create_autocmd({ "BufAdd" }, {
     buf_attach(args.buf)
   end
 })
-
-
+buf_attach(0)
 
 return M

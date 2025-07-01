@@ -52,30 +52,33 @@ local function contains(table, val)
 end
 
 local function buf_attach(buf)
-  vim.api.nvim_buf_attach(buf, true, {
+  assert(vim.api.nvim_buf_attach(buf, true, {
     on_bytes = function(_, bufnr, changedtick, start_row, start_col, start_byte, old_end_row, old_end_col, old_end_byte,
                         new_end_row, new_end_col, new_end_byte)
-      -- if contains(knownCapabilities, vim.bo.filetype) then
-      print(start_row .. "," .. new_end_row .. "," .. start_byte .. "," .. new_end_byte)
-      if new_end_byte < 1 then
-        return nil
+      if contains(knownCapabilities, vim.bo.filetype) then
+        print(start_row .. "," .. new_end_row .. "," .. start_byte .. "," .. new_end_byte)
+        if new_end_byte < 1 then
+          return nil
+        end
+        local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, start_row + new_end_row,
+          start_col + new_end_col, {})
+        for i = 1, #lines do
+          print(lines[i])
+        end
+        -- else
+        --   print("Unknown type: " .. vim.bo.filetype)
       end
-      local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, start_row + new_end_row,
-        start_col + new_end_col, {})
-      for i = 1, #lines do
-        print(lines[i])
-      end
-      -- end
     end
-  })
+  }), "Failed to attach to buffer " .. buf)
 end
 
-vim.api.nvim_create_autocmd({ "BufAdd" }, {
+vim.api.nvim_create_autocmd({ "BufEnter", "VimEnter" }, {
   callback = function(args)
-    print("Added buffer!")
     buf_attach(args.buf)
+    print("Added buffer " .. args.buf)
   end
 })
-buf_attach(0)
+
+M.getCapabilities()
 
 return M

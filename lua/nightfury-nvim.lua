@@ -60,11 +60,10 @@ local function buf_attach(buf)
       if new_end_byte < 1 then
         return nil
       end
-      if start_row <= new_end_row then
-        local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_byte, new_end_row, new_end_byte, {})
-        for i = 1, #lines do
-          print(lines[i])
-        end
+      local lines = vim.api.nvim_buf_get_text(bufnr, start_row, start_col, start_row + new_end_row,
+        start_col + new_end_col, {})
+      for i = 1, #lines do
+        print(lines[i])
       end
       -- end
     end
